@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="RoboReach – Wireless Mecanum-Wheeled Mobile Manipulator developed by Prerak Kumar Patel for IIT Techfest 2026–27.">
+  <meta name="theme-color" content="#08152e">
+  <title>RoboReach – Wireless Mecanum-Wheeled Mobile Manipulator | Prerak Kumar Patel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root,
+    :root[data-theme="dark"] {
+      --bg: #071226;
+      --bg-alt: #0b1b38;
+      --surface: #0f2347;
+      --surface-deep: #060f20;
+      --ink: #eef4ff;
+      --mute: #9cb2d9;
+      --electric: #2d8cff;
+      --electric-glow: rgba(45, 140, 255, 0.28);
+      --accent: #f7c318;
+      --accent-ink: #071226;
+      --line: rgba(156, 178, 217, 0.16);
+      --line-strong: rgba(45, 140, 255, 0.35);
+      --grid-line: rgba(45, 140, 255, 0.08);
+      --chassis-top: #163366;
+      --chassis-bot: #0e2246;
+      --chassis-side: #08152e;
+      --wheel-bg: #040b18;
+      --header-bg: rgba(7, 18, 38, 0.84);
+      --shadow: 0 20px 50px rgba(2, 8, 22, 0.55);
+      color-scheme: dark;
+    }
+
+    :root[data-theme="light"] {
+      --bg: #f4f7fc;
+      --bg-alt: #e9f0fb;
+      --surface: #ffffff;
+      --surface-deep: #e2eaf7;
+      --ink: #0a1f44;
+      --mute: #475e85;
+      --electric: #146ef5;
+      --electric-glow: rgba(20, 110, 245, 0.18);
+      --accent: #f2b705;
+      --accent-ink: #0a1f44;
+      --line: rgba(10, 31, 68, 0.14);
+      --line-strong: rgba(20, 110, 245, 0.35);
+      --grid-line: rgba(10, 31, 68, 0.06);
+      --chassis-top: #ffffff;
+      --chassis-bot: #dce6f7;
+      --chassis-side: #9db4da;
+      --wheel-bg: #0a1f44;
+      --header-bg: rgba(244, 247, 252, 0.88);
+      --shadow: 0 18px 40px rgba(10, 31, 68, 0.08);
+      color-scheme: light;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 84px;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Figtree", system-ui, -apple-system, sans-serif;
+      font-size: 16.5px;
+      line-height: 1.65;
+      color: var(--ink);
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 42px 42px;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: "Unbounded", "Figtree", sans-serif;
+      margin: 0;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    p { margin: 0; }
+    a { color: inherit; }
+
+    code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--surface-deep);
+      border: 1px solid var(--line);
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 12px;
+      z-index: 999;
+      background: var(--accent);
+      color: var(--accent-ink);
+      padding: 10px 16px;
+      font-weight: 700;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    .skip-link:focus { left: 16px; }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .container {
+      width: min(1140px, 100% - 40px);
+      margin-inline: auto;
+    }
+
+    /* Header / Nav */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 70px;
+      gap: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-family: "Unbounded", sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-mark { display: inline-flex; color: var(--ink); }
+    .brand-text span { color: var(--accent); }
+
+    .primary-nav {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .primary-nav a {
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--mute);
+      transition: color 0.2s ease;
+      position: relative;
+    }
+
+    .primary-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.2s ease;
+    }
+
+    .primary-nav a:hover,
+    .primary-nav a:focus-visible { color: var(--ink); }
+    .primary-nav a:hover::after { width: 100%; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .theme-toggle,
+    .menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .theme-toggle:hover,
+    .menu-toggle:hover {
+      border-color: var(--electric);
+      transform: translateY(-1px);
+    }
+
+    :root[data-theme="dark"] .icon-moon,
+    :root[data-theme="light"] .icon-sun { display: none; }
+
+    .menu-toggle { display: none; flex-direction: column; gap: 5px; }
+    .menu-toggle span {
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Hero */
+    .hero { position: relative; padding: 58px 0 84px; overflow: hidden; }
+
+    .hero-glow {
+      position: absolute;
+      top: -120px;
+      right: -80px;
+      width: 560px;
+      height: 560px;
+      background: radial-gradient(circle, var(--electric-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 44px;
+    }
+
+    .eyebrow-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-accent { background: var(--accent); color: var(--accent-ink); }
+    .badge-outline { border: 1px solid var(--line-strong); color: var(--electric); background: var(--surface); }
+
+    .hero-title { font-size: clamp(44px, 7.5vw, 80px); font-weight: 700; letter-spacing: -0.03em; }
+    .accent-text { color: var(--accent); }
+    .hero-subtitle { margin-top: 12px; font-size: clamp(18px, 2.2vw, 22px); font-weight: 600; color: var(--electric); }
+    .hero-tagline { margin-top: 10px; font-family: "Unbounded", sans-serif; font-size: clamp(15px, 1.8vw, 18px); color: var(--ink); }
+    .hero-desc { margin-top: 16px; max-width: 58ch; color: var(--mute); font-size: 17px; }
+
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15.5px;
+      text-decoration: none;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      box-shadow: 0 8px 24px rgba(247, 195, 24, 0.25);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(247, 195, 24, 0.35); }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border-color: var(--line-strong);
+    }
+    .btn-secondary:hover { transform: translateY(-2px); border-color: var(--electric); box-shadow: 0 10px 24px var(--electric-glow); }
+
+    .hero-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .pill {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12.5px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--mute);
+    }
+
+    /* Hero Robot Card */
+    .bot-card {
+      position: relative;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      padding: 36px 20px 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .bot-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 45%, var(--electric-glow), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hud-corner {
+      position: absolute;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10.5px;
+      color: var(--mute);
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+    .hud-tl { top: 12px; left: 14px; }
+    .hud-tr { top: 12px; right: 14px; color: var(--electric); }
+    .hud-bl { bottom: 12px; left: 14px; }
+    .hud-br { bottom: 12px; right: 14px; color: var(--accent); }
+
+    .bot-stage-3d { position: relative; display: flex; justify-content: center; align-items: center; }
+    .bot-shadow {
+      position: absolute;
+      bottom: 18px;
+      width: 62%;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.35);
+      filter: blur(12px);
+    }
+
+    .hero-bot-svg { width: min(320px, 100%); height: auto; animation: hoverFloat 5s ease-in-out infinite; }
+    @keyframes hoverFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+
+    .hero-bot-svg .arm-segment-1 { transform-origin: 160px 134px; animation: heroArmReach 6.5s ease-in-out infinite; }
+    .hero-bot-svg .arm-segment-2 { transform-origin: 160px 74px; animation: heroForearm 6.5s ease-in-out infinite; }
+    .hero-bot-svg .jaw-left,
+    .hero-bot-svg .jaw-right { transform-origin: 160px 26px; animation: heroGrip 6.5s ease-in-out infinite; }
+    .hero-bot-svg .jaw-left { --dir: 1; }
+    .hero-bot-svg .jaw-right { --dir: -1; }
+
+    @keyframes heroArmReach { 0%, 100% { transform: rotate(-22deg); } 45%, 60% { transform: rotate(18deg); } }
+    @keyframes heroForearm { 0%, 100% { transform: rotate(32deg); } 45%, 60% { transform: rotate(-16deg); } }
+    @keyframes heroGrip {
+      0%, 35% { transform: rotate(calc(var(--dir) * 16deg)); }
+      50%, 85% { transform: rotate(calc(var(--dir) * -4deg)); }
+      100% { transform: rotate(calc(var(--dir) * 16deg)); }
+    }
+
+    .signal-waves path { animation: pulseSignal 2.6s ease-in-out infinite; }
+    .signal-waves path:nth-child(2) { animation-delay: 0.25s; }
+    .signal-waves path:nth-child(3) { animation-delay: 0.5s; }
+    @keyframes pulseSignal { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.95; } }
+
+    /* Sections */
+    .section { padding: 84px 0; border-top: 1px solid var(--line); }
+    .section-alt { background: var(--bg-alt); }
+    .section-head { margin-bottom: 42px; max-width: 68ch; }
+    .section-tag {
+      display: inline-block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--electric);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-head h2 { font-size: clamp(28px, 4vw, 42px); }
+    .section-lead { margin-top: 14px; color: var(--mute); font-size: 17.5px; }
+
+    /* About */
+    .about-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 28px; align-items: start; }
+    .about-panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow);
+    }
+    .about-highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .stat-box:hover { border-color: var(--electric); transform: translateY(-2px); }
+    .stat-label { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--electric); text-transform: uppercase; }
+    .stat-value { font-family: "Unbounded", sans-serif; font-size: 16px; }
+    .stat-note { font-size: 13.5px; color: var(--mute); line-height: 1.45; }
+
+    /* Features */
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 26px;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .feature-card:hover { transform: translateY(-4px); border-color: var(--electric); box-shadow: 0 14px 30px var(--electric-glow); }
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: var(--surface-deep);
+      border: 1px solid var(--line);
+      margin-bottom: 16px;
+    }
+    .feature-icon svg { width: 34px; height: 34px; }
+    .feature-card h3 { font-size: 18px; margin-bottom: 10px; }
+    .feature-card p { font-size: 15.5px; color: var(--mute); }
+
+    /* Interactive Lab */
+    .sim-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      margin-bottom: 26px;
+      font-size: 14.5px;
+    }
+    .sim-notice svg { flex-shrink: 0; color: var(--accent); margin-top: 2px; }
+
+    .lab-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; align-items: start; }
+    .arena-wrap {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .arena-topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .mono-pill {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--surface-deep);
+      border: 1px solid var(--line);
+      color: var(--mute);
+    }
+    .live-dir { color: var(--accent); border-color: rgba(247, 195, 24, 0.35); }
+
+    .stage {
+      position: relative;
+      height: 410px;
+      border-radius: 12px;
+      border: 1.5px solid var(--line-strong);
+      background-color: var(--surface-deep);
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 32px 32px;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .stage-crosshair { position: absolute; inset: 0; pointer-events: none; }
+    .stage-crosshair::before,
+    .stage-crosshair::after { content: ""; position: absolute; background: var(--line); }
+    .stage-crosshair::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+    .stage-crosshair::after { top: 50%; left: 0; right: 0; height: 1px; }
+
+    .rb { position: absolute; left: 0; top: 0; width: 92px; height: 110px; will-change: transform; }
+    .rb svg { width: 100%; height: 100%; overflow: visible; }
+
+    .sim-arm-slide { transition: transform 0.3s ease; }
+    .sim-arm-slide.extended { transform: translateY(-16px); }
+    .sim-jaw-l, .sim-jaw-r { transition: transform 0.25s ease; }
+    .sim-jaw-l { transform-origin: 97px 10px; }
+    .sim-jaw-r { transform-origin: 103px 10px; }
+    .sim-gripper.closed .sim-jaw-l { transform: rotate(16deg); }
+    .sim-gripper.closed .sim-jaw-r { transform: rotate(-16deg); }
+
+    .roll { animation: rollerScroll 0.55s linear infinite; animation-play-state: paused; }
+    .roll.rv { animation-direction: reverse; }
+    @keyframes rollerScroll { to { transform: translateY(12px); } }
+
+    .control-panel { display: flex; flex-direction: column; gap: 16px; }
+    .panel-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .panel-card h3 { font-size: 16px; }
+
+    .reset-btn {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface-deep);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .reset-btn:hover { border-color: var(--electric); }
+
+    .rot-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .dpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .ctrl-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface-deep);
+      color: var(--ink);
+      font-family: "Figtree", sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    }
+    .rot-row .ctrl-btn { flex-direction: row; gap: 8px; padding: 10px 8px; }
+    .ctrl-btn kbd {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      opacity: 0.85;
+    }
+    .ctrl-arrow { font-size: 17px; line-height: 1; }
+    .ctrl-btn small { font-size: 11.5px; color: var(--mute); }
+    .ctrl-btn.on, .ctrl-btn:active {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+      transform: scale(0.97);
+    }
+    .ctrl-btn.on small, .ctrl-btn:active small { color: var(--accent-ink); }
+    .stop-btn:hover { border-color: var(--accent); }
+
+    .arm-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .toggle-act-btn {
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface-deep);
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .toggle-act-btn[aria-pressed="true"] { background: var(--electric); color: #ffffff; border-color: var(--electric); }
+
+    .wheels-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .wheel-box {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--surface-deep);
+      border: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .w-name { font-size: 13px; color: var(--mute); }
+    .w-state { display: inline-flex; align-items: center; gap: 5px; font-family: "JetBrains Mono", monospace; }
+    .w-dir { font-size: 15px; color: var(--ink); }
+    .w-txt { font-size: 11.5px; color: var(--mute); }
+    .wheel-box.is-fwd { border-color: var(--electric); }
+    .wheel-box.is-fwd .w-dir, .wheel-box.is-fwd .w-txt { color: var(--electric); }
+    .wheel-box.is-rev { border-color: var(--accent); }
+    .wheel-box.is-rev .w-dir, .wheel-box.is-rev .w-txt { color: var(--accent); }
+    .kinematics-note { margin-top: 12px; font-size: 13.5px; color: var(--mute); }
+
+    /* Specs */
+    .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .spec-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+    .spec-card h3 { font-size: 17px; color: var(--electric); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .spec-list { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+    .spec-list dt { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--mute); text-transform: uppercase; }
+    .spec-list dd { margin: 4px 0 0; font-weight: 600; font-size: 15px; }
+    .spec-list dd.tbu { color: var(--accent); font-family: "JetBrains Mono", monospace; font-size: 13.5px; }
+
+    /* Timeline */
+    .timeline { list-style: none; margin: 0; padding: 0; position: relative; display: flex; flex-direction: column; gap: 20px; }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 23px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: linear-gradient(var(--electric), var(--accent));
+    }
+    .timeline-item { position: relative; display: flex; gap: 22px; align-items: flex-start; }
+    .timeline-marker {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 2px solid var(--electric);
+      color: var(--electric);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .timeline-highlight .timeline-marker { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .timeline-content { flex: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; }
+    .timeline-highlight .timeline-content { border-color: var(--accent); }
+    .timeline-phase { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--electric); margin-bottom: 6px; }
+    .timeline-highlight .timeline-phase { color: var(--accent); }
+    .timeline-content h3 { font-size: 18px; margin-bottom: 8px; }
+    .timeline-content p { color: var(--mute); font-size: 15.5px; }
+
+    /* Developer */
+    .dev-card {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 32px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      align-items: start;
+    }
+    .dev-avatar { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+    .avatar-ring {
+      width: 148px;
+      height: 148px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--electric), var(--accent));
+      padding: 4px;
+    }
+    .avatar-ring span {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--surface-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Unbounded", sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .dev-loc { font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--mute); }
+    .dev-info h3 { font-size: clamp(22px, 3vw, 28px); }
+    .dev-role { margin-top: 6px; color: var(--electric); font-weight: 600; font-size: 16.5px; }
+    .dev-edu { margin-top: 4px; color: var(--accent); font-weight: 600; font-size: 15px; }
+    .dev-bio { margin-top: 16px; color: var(--mute); max-width: 65ch; }
+    .skills-block { margin-top: 22px; }
+    .skills-block h4 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute); margin-bottom: 12px; }
+    .skills-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+    .skills-list li {
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      background: var(--surface-deep);
+      border: 1px solid var(--line-strong);
+    }
+    .dev-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+
+    /* Gallery */
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .gallery-card {
+      margin: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .gallery-card:hover { border-color: var(--electric); transform: translateY(-3px); }
+    .gallery-featured { grid-column: span 2; }
+    .gallery-placeholder svg { display: block; width: 100%; height: auto; }
+    .gallery-card figcaption { padding: 18px 20px; }
+    .gallery-tag { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+    .gallery-card h3 { font-size: 17px; margin-bottom: 6px; }
+    .gallery-card p { font-size: 14.5px; color: var(--mute); }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--line);
+      background: var(--bg-alt);
+      padding: 36px 0 42px;
+      font-size: 14.5px;
+      color: var(--mute);
+    }
+    .footer-grid { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+    .footer-brand strong { color: var(--ink); font-family: "Unbounded", sans-serif; font-size: 15px; }
+    .footer-brand p { margin-top: 4px; font-size: 13.5px; }
+    .footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .footer-links a { color: var(--electric); font-weight: 600; text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.is-visible { opacity: 1; transform: none; }
+
+    @media (max-width: 980px) {
+      .hero-grid, .about-grid, .lab-grid, .specs-grid, .features-grid { grid-template-columns: 1fr; }
+      .hero-visual { order: -1; }
+      .dev-card { grid-template-columns: 1fr; text-align: center; }
+      .dev-bio { margin-inline: auto; }
+      .skills-list, .dev-actions { justify-content: center; }
+    }
+
+    @media (max-width: 780px) {
+      .menu-toggle { display: inline-flex; }
+      .primary-nav {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line-strong);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 24px 24px;
+        gap: 14px;
+        transform: translateY(-120%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.25s ease, opacity 0.25s ease;
+      }
+      .primary-nav.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+      .primary-nav a { font-size: 16px; width: 100%; padding: 6px 0; }
+      .about-highlights, .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-featured { grid-column: span 1; }
+      .stage { height: 340px; }
+      .timeline::before { left: 20px; }
+      .timeline-marker { width: 42px; height: 42px; font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header" id="top">
+    <div class="container nav-inner">
+      <a class="brand" href="#top" aria-label="RoboReach Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+            <rect x="4" y="4" width="24" height="24" rx="6" stroke="currentColor" stroke-width="2"/>
+            <circle cx="16" cy="16" r="4.5" fill="var(--accent)"/>
+            <path d="M9 10v12M23 10v12" stroke="var(--electric)" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">Robo<span>Reach</span></span>
+      </a>
+
+      <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#demo">Simulation</a>
+        <a href="#specs">Specs</a>
+        <a href="#journey">Journey</a>
+        <a href="#developer">Developer</a>
+        <a href="#gallery">Gallery</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle light or dark theme" aria-pressed="true" title="Switch theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primary-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow-row">
+            <span class="badge badge-accent">IIT Techfest 2026–27</span>
+            <span class="badge badge-outline">Mobile Robotics Project</span>
+          </div>
+
+          <h1 class="hero-title">
+            <span class="title-word">Robo</span><span class="title-word accent-text">Reach</span>
+          </h1>
+          <p class="hero-subtitle">Wireless Mecanum-Wheeled Mobile Manipulator</p>
+          <p class="hero-tagline">“Move in Every Direction. Reach Beyond Limits.”</p>
+
+          <p class="hero-desc">
+            A wirelessly controlled mobile robot built to slide smoothly in any direction on four mecanum wheels, then reach out and grasp objects using its onboard servo-driven robotic arm and gripper.
+          </p>
+
+          <div class="hero-cta">
+            <a href="#about" class="btn btn-primary">
+              <span>Explore the Project</span>
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M4 10h12M11 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a href="#developer" class="btn btn-secondary">Meet the Developer</a>
+          </div>
+
+          <div class="hero-pills" aria-label="Core capabilities">
+            <span class="pill">Omnidirectional Mecanum Drive</span>
+            <span class="pill">Servo Arm &amp; Gripper</span>
+            <span class="pill">Wireless Operation</span>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal" aria-hidden="true">
+          <div class="bot-card">
+            <div class="hud-corner hud-tl">SYS // ROBOREACH</div>
+            <div class="hud-corner hud-tr">DRIVE: 4WD MECANUM</div>
+            <div class="hud-corner hud-bl">MANIPULATOR: SERVO ARM</div>
+            <div class="hud-corner hud-br">LINK: WIRELESS</div>
+
+            <div class="bot-stage-3d">
+              <div class="bot-shadow"></div>
+              <svg viewBox="0 0 320 330" class="hero-bot-svg" id="hero-bot-svg">
+                <defs>
+                  <linearGradient id="chassisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="var(--chassis-top)"/>
+                    <stop offset="100%" stop-color="var(--chassis-bot)"/>
+                  </linearGradient>
+                  <linearGradient id="deckGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="var(--electric)" stop-opacity="0.24"/>
+                    <stop offset="100%" stop-color="var(--electric)" stop-opacity="0.04"/>
+                  </linearGradient>
+                  <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                    <feMerge>
+                      <feMergeNode in="blur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <g class="signal-waves" transform="translate(160, 224)">
+                  <path d="M-26 0a26 26 0 0 1 52 0" fill="none" stroke="var(--electric)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M-40 -6a42 42 0 0 1 80 0" fill="none" stroke="var(--electric)" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+                  <path d="M-54 -12a58 58 0 0 1 108 0" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+                </g>
+
+                <g class="hero-wheels-layer"></g>
+
+                <rect x="86" y="114" width="148" height="166" rx="18" fill="var(--chassis-side)" stroke="var(--ink)" stroke-width="2.5"/>
+                <rect x="86" y="102" width="148" height="164" rx="18" fill="url(#chassisGrad)" stroke="var(--electric)" stroke-width="2.5"/>
+                <rect x="98" y="114" width="124" height="140" rx="12" fill="url(#deckGrad)" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+                <rect x="122" y="182" width="76" height="52" rx="8" fill="var(--surface-deep)" stroke="var(--electric)" stroke-width="1.8"/>
+                <circle cx="160" cy="208" r="14" fill="none" stroke="var(--electric)" stroke-width="2" opacity="0.75"/>
+                <circle cx="160" cy="208" r="5.5" fill="var(--accent)" filter="url(#softGlow)"/>
+                <path d="M132 194h12M176 194h12M132 222h12M176 222h12" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+
+                <g class="hero-arm-base">
+                  <circle cx="160" cy="134" r="18" fill="var(--surface-deep)" stroke="var(--electric)" stroke-width="2.5"/>
+                  <circle cx="160" cy="134" r="9" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+
+                  <g class="arm-segment-1">
+                    <rect x="151" y="74" width="18" height="60" rx="8" fill="url(#chassisGrad)" stroke="var(--ink)" stroke-width="2.5"/>
+                    <line x1="160" y1="84" x2="160" y2="122" stroke="var(--electric)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+                    <circle cx="160" cy="74" r="9" fill="var(--electric)" stroke="var(--ink)" stroke-width="2"/>
+
+                    <g class="arm-segment-2">
+                      <rect x="153" y="28" width="14" height="46" rx="6" fill="url(#chassisGrad)" stroke="var(--ink)" stroke-width="2.5"/>
+                      <circle cx="160" cy="28" r="7" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+
+                      <g class="gripper-assembly">
+                        <path class="jaw jaw-left" d="M156 26 L142 10 L147 2" fill="none" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path class="jaw jaw-right" d="M164 26 L178 10 L173 2" fill="none" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">01 // Project Overview</span>
+          <h2>About RoboReach</h2>
+          <p class="section-lead">
+            Bridging agile omnidirectional mobility with precision object manipulation in a single wireless platform.
+          </p>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-panel reveal">
+            <p>
+              <strong>RoboReach</strong> is a wireless mobile robotic manipulator designed to overcome the maneuvering constraints of conventional differential-drive robots. By pairing a four-wheel mecanum drive train with an onboard servo-controlled robotic arm and gripper, RoboReach can glide into tight spaces and interact directly with objects.
+            </p>
+            <p>
+              Instead of rotating its chassis before changing direction, RoboReach moves forward, backward, sideways, diagonally, or spins in place on demand. Once positioned, the operator uses the wireless link to steer the robotic arm and actuate the gripper to pick up and handle target objects.
+            </p>
+          </div>
+
+          <div class="about-highlights reveal">
+            <div class="stat-box">
+              <span class="stat-label">Mobility Class</span>
+              <strong class="stat-value">4-Wheel Mecanum</strong>
+              <span class="stat-note">Omnidirectional planar movement without turning first</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Manipulation</span>
+              <strong class="stat-value">Servo Arm &amp; Gripper</strong>
+              <span class="stat-note">Controlled reaching, positioning, and object grasping</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Control Link</span>
+              <strong class="stat-value">Wireless Control</strong>
+              <span class="stat-note">Tether-free remote operation of drive and manipulator</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Exhibition Milestone</span>
+              <strong class="stat-value">IIT Techfest 2026–27</strong>
+              <span class="stat-note">Presented 11 October 2026 as a working build</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">02 // Core Architecture</span>
+          <h2>Main Features</h2>
+          <p class="section-lead">
+            Five integrated subsystems engineered to work in harmony from wheel rollers to end-effector jaws.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="6" y="8" width="10" height="14" rx="2.5"/>
+                <rect x="32" y="8" width="10" height="14" rx="2.5"/>
+                <rect x="6" y="26" width="10" height="14" rx="2.5"/>
+                <rect x="32" y="26" width="10" height="14" rx="2.5"/>
+                <path d="M16 24h16M24 16v16" stroke="var(--accent)" stroke-linecap="round"/>
+                <path d="M21 19l3-3 3 3M21 29l3 3 3-3M19 21l-3 3 3 3M29 21l3 3-3 3" stroke="var(--electric)" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Mecanum Wheel Drive</h3>
+            <p>Four angled-roller wheels enable true omnidirectional movement—forward, backward, lateral strafing, diagonal travel, and zero-radius rotation.</p>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="37" r="4.5" stroke="var(--accent)"/>
+                <circle cx="24" cy="21" r="4" stroke="var(--electric)"/>
+                <path d="M14.5 33.5L22 24M27 19l11-5" stroke-linecap="round"/>
+                <path d="M8 42h16" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Robotic Arm</h3>
+            <p>A servo-controlled manipulator arm mounted on the chassis provides multi-angle reach and positioning to approach targets smoothly.</p>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M16 14v8l-5 8 5 6M32 14v8l5 8-5 6" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="18" y="8" width="12" height="8" rx="2" stroke="var(--electric)"/>
+                <circle cx="24" cy="30" r="4" stroke="var(--accent)"/>
+              </svg>
+            </div>
+            <h3>Smart Gripper</h3>
+            <p>An actuated end-effector gripper opens and closes on command to grasp, lift, and relocate objects rather than only navigating around them.</p>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M10 21a20 20 0 0 1 28 0" stroke="var(--electric)" stroke-linecap="round"/>
+                <path d="M15 26.5a13 13 0 0 1 18 0" stroke="var(--accent)" stroke-linecap="round"/>
+                <circle cx="24" cy="34" r="3.5" fill="var(--accent)" stroke="none"/>
+                <path d="M24 34v6" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Wireless Control</h3>
+            <p>Drive commands and manipulator signals travel over a wireless link, giving the operator unrestricted remote control with no trailing cables.</p>
+          </article>
+
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="14" y="14" width="20" height="20" rx="4" stroke="var(--electric)"/>
+                <rect x="20" y="20" width="8" height="8" rx="1.5" fill="var(--accent)" stroke="none"/>
+                <path d="M19 8v6M29 8v6M19 34v6M29 34v6M8 19h6M8 29h6M34 19h6M34 29h6" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Integrated Electronics</h3>
+            <p>Unified wiring and embedded control circuitry coordinate drive motors, servo actuators, sensors, and power distribution on a compact frame.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">03 // Interactive Kinematics Lab</span>
+          <h2>Drive RoboReach (Simulation)</h2>
+          <p class="section-lead">
+            Experiment with omnidirectional mecanum drive and arm controls. Hold any direction button or use <strong>W A S D / Arrow Keys</strong> and <strong>Q / E</strong> to rotate.
+          </p>
+        </div>
+
+        <div class="sim-notice reveal" role="note">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01" stroke-linecap="round"/>
+          </svg>
+          <span><strong>Web Simulation Only:</strong> This interactive arena models mecanum wheel kinematics visually in your browser and does not transmit signals to physical robot hardware.</span>
+        </div>
+
+        <div class="lab-grid reveal">
+          <div class="arena-wrap">
+            <div class="arena-topbar">
+              <span class="mono-pill">ARENA // TOP-DOWN VIEW</span>
+              <span class="mono-pill live-dir" id="motion-readout" aria-live="polite">State: Stationary</span>
+            </div>
+
+            <div class="stage" id="stage" role="img" aria-label="Interactive top-down simulation arena for RoboReach">
+              <div class="stage-crosshair" aria-hidden="true"></div>
+              <div class="rb" id="rb">
+                <svg viewBox="0 0 200 240" class="rbSvg" id="demoSvg">
+                  <rect x="46" y="70" width="108" height="130" rx="14" fill="var(--chassis-top)" stroke="var(--electric)" stroke-width="3"/>
+                  <rect x="58" y="84" width="84" height="102" rx="8" fill="none" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                  <polygon points="100,74 93,85 107,85" fill="var(--accent)"/>
+                  <g class="sim-arm" id="sim-arm">
+                    <circle cx="100" cy="96" r="10" fill="var(--accent)" stroke="var(--ink)" stroke-width="2.5"/>
+                    <g class="sim-arm-slide" id="sim-arm-slide">
+                      <rect x="94" y="42" width="12" height="52" rx="5" fill="var(--chassis-bot)" stroke="var(--ink)" stroke-width="2.5"/>
+                      <rect x="95" y="10" width="10" height="36" rx="4" fill="var(--chassis-bot)" stroke="var(--ink)" stroke-width="2.5"/>
+                      <g class="sim-gripper" id="sim-gripper">
+                        <path class="sim-jaw-l" d="M97 10 L87 -10" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+                        <path class="sim-jaw-r" d="M103 10 L113 -10" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+                      </g>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-panel">
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>Movement Controls</h3>
+                <button type="button" class="reset-btn" id="reset-sim">Reset Center</button>
+              </div>
+
+              <div class="rot-row">
+                <button type="button" class="ctrl-btn" data-cmd="rotL" title="Rotate Counter-Clockwise (Q)">
+                  <span class="ctrl-arrow">↺</span>
+                  <span>Rotate Left <kbd>Q</kbd></span>
+                </button>
+                <button type="button" class="ctrl-btn" data-cmd="rotR" title="Rotate Clockwise (E)">
+                  <span class="ctrl-arrow">↻</span>
+                  <span>Rotate Right <kbd>E</kbd></span>
+                </button>
+              </div>
+
+              <div class="dpad-grid" role="group" aria-label="Omnidirectional movement pad">
+                <button type="button" class="ctrl-btn" data-cmd="diagFL" aria-label="Diagonal Forward Left">
+                  <span class="ctrl-arrow">↖</span><small>Diag FL</small>
+                </button>
+                <button type="button" class="ctrl-btn" data-cmd="fwd" aria-label="Forward (W or Up Arrow)">
+                  <span class="ctrl-arrow">↑</span><small>Forward</small>
+                </button>
+                <button type="button" class="ctrl-btn" data-cmd="diagFR" aria-label="Diagonal Forward Right">
+                  <span class="ctrl-arrow">↗</span><small>Diag FR</small>
+                </button>
+
+                <button type="button" class="ctrl-btn" data-cmd="left" aria-label="Slide Left (A or Left Arrow)">
+                  <span class="ctrl-arrow">←</span><small>Strafe L</small>
+                </button>
+                <button type="button" class="ctrl-btn stop-btn" id="stop-sim" aria-label="Stop movement">
+                  <span class="ctrl-arrow">■</span><small>Stop</small>
+                </button>
+                <button type="button" class="ctrl-btn" data-cmd="right" aria-label="Slide Right (D or Right Arrow)">
+                  <span class="ctrl-arrow">→</span><small>Strafe R</small>
+                </button>
+
+                <button type="button" class="ctrl-btn" data-cmd="diagBL" aria-label="Diagonal Backward Left">
+                  <span class="ctrl-arrow">↙</span><small>Diag BL</small>
+                </button>
+                <button type="button" class="ctrl-btn" data-cmd="bwd" aria-label="Backward (S or Down Arrow)">
+                  <span class="ctrl-arrow">↓</span><small>Reverse</small>
+                </button>
+                <button type="button" class="ctrl-btn" data-cmd="diagBR" aria-label="Diagonal Backward Right">
+                  <span class="ctrl-arrow">↘</span><small>Diag BR</small>
+                </button>
+              </div>
+
+              <div class="arm-controls">
+                <button type="button" class="toggle-act-btn" id="toggle-arm" aria-pressed="false">Extend Arm</button>
+                <button type="button" class="toggle-act-btn" id="toggle-grip" aria-pressed="false">Close Gripper</button>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <h3>Wheel Rotation Telemetry</h3>
+              <div class="wheels-grid" id="wheels-telemetry" aria-live="polite">
+                <div class="wheel-box" data-wheel="0">
+                  <span class="w-name">Front Left</span>
+                  <span class="w-state"><b class="w-dir">–</b> <small class="w-txt">Idle</small></span>
+                </div>
+                <div class="wheel-box" data-wheel="1">
+                  <span class="w-name">Front Right</span>
+                  <span class="w-state"><b class="w-dir">–</b> <small class="w-txt">Idle</small></span>
+                </div>
+                <div class="wheel-box" data-wheel="2">
+                  <span class="w-name">Rear Left</span>
+                  <span class="w-state"><b class="w-dir">–</b> <small class="w-txt">Idle</small></span>
+                </div>
+                <div class="wheel-box" data-wheel="3">
+                  <span class="w-name">Rear Right</span>
+                  <span class="w-state"><b class="w-dir">–</b> <small class="w-txt">Idle</small></span>
+                </div>
+              </div>
+              <p class="kinematics-note">
+                Notice how diagonal motion drives only two opposite wheels while the other two remain idle, and lateral strafing runs diagonal wheel pairs in opposing directions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="specs">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">04 // Engineering Data</span>
+          <h2>Technical Specifications</h2>
+          <p class="section-lead">
+            Verified system architecture based on the RoboReach build. Unconfirmed hardware measurements and exact part numbers are marked <em>To be updated</em>.
+          </p>
+        </div>
+
+        <div class="specs-grid reveal">
+          <div class="spec-card">
+            <h3>Mobility &amp; Drive Train</h3>
+            <dl class="spec-list">
+              <div><dt>Drive Configuration</dt><dd>4-Wheel Mecanum Drive (Omnidirectional)</dd></div>
+              <div><dt>Supported Motions</dt><dd>Forward, Reverse, Lateral Strafe, Diagonal, In-Place Rotation</dd></div>
+              <div><dt>Drive Motor Model &amp; Driver</dt><dd class="tbu">To be updated</dd></div>
+              <div><dt>Wheel Diameter</dt><dd class="tbu">To be updated</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-card">
+            <h3>Manipulator &amp; Control</h3>
+            <dl class="spec-list">
+              <div><dt>Arm Architecture</dt><dd>Servo-controlled Robotic Arm with End-Effector Gripper</dd></div>
+              <div><dt>Degrees of Freedom &amp; Servo Model</dt><dd class="tbu">To be updated</dd></div>
+              <div><dt>Control Link</dt><dd>Wireless remote control (drive + arm commands)</dd></div>
+              <div><dt>Wireless Module / Protocol</dt><dd class="tbu">To be updated</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-card">
+            <h3>Electronics, Power &amp; Mechanical</h3>
+            <dl class="spec-list">
+              <div><dt>Electronics Integration</dt><dd>Microcontroller, motor, servo &amp; sensor integration</dd></div>
+              <div><dt>Controller Board &amp; Battery Specs</dt><dd class="tbu">To be updated</dd></div>
+              <div><dt>Chassis Dimensions, Weight &amp; Payload</dt><dd class="tbu">To be updated</dd></div>
+              <div><dt>Software &amp; CAD Stack</dt><dd>Arduino, C, Python, SOLIDWORKS</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="journey">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">05 // Engineering Milestones</span>
+          <h2>Project Journey</h2>
+          <p class="section-lead">
+            From initial concept sketches to a working wireless mobile manipulator showcased at IIT Techfest 2026–27.
+          </p>
+        </div>
+
+        <ol class="timeline">
+          <li class="timeline-item reveal">
+            <div class="timeline-marker">01</div>
+            <div class="timeline-content">
+              <span class="timeline-phase">Phase 1 // Architecture</span>
+              <h3>Robot Concept and Planning</h3>
+              <p>Defined the goal of combining omnidirectional mecanum navigation with a gripping manipulator, mapping out chassis layout, wheel orientation, and control requirements.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal">
+            <div class="timeline-marker">02</div>
+            <div class="timeline-content">
+              <span class="timeline-phase">Phase 2 // Hardware Structure</span>
+              <h3>Mechanical Assembly</h3>
+              <p>Assembled the mobile base and mounted the four angled-roller mecanum wheels in proper X-pattern geometry for balanced multidirectional traction.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal">
+            <div class="timeline-marker">03</div>
+            <div class="timeline-content">
+              <span class="timeline-phase">Phase 3 // Embedded Systems</span>
+              <h3>Electronics and Motor Integration</h3>
+              <p>Wired the drive motors, power paths, sensors, and controller hardware, ensuring synchronized wheel rotation across every movement axis.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal">
+            <div class="timeline-marker">04</div>
+            <div class="timeline-content">
+              <span class="timeline-phase">Phase 4 // Manipulation</span>
+              <h3>Robotic Arm and Gripper Integration</h3>
+              <p>Mounted and calibrated the servo-controlled robotic arm and gripper assembly, enabling reliable reaching, positioning, and object grasping.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal">
+            <div class="timeline-marker">05</div>
+            <div class="timeline-content">
+              <span class="timeline-phase">Phase 5 // Remote Link</span>
+              <h3>Wireless Control Implementation</h3>
+              <p>Established the wireless communication link so both omnidirectional chassis motion and arm/gripper actuation operate seamlessly without physical tethers.</p>
+            </div>
+          </li>
+          <li class="timeline-item timeline-highlight reveal">
+            <div class="timeline-marker">06</div>
+            <div class="timeline-content">
+              <span class="timeline-phase">11 October 2026 // Exhibition</span>
+              <h3>Project Demonstration at IIT Techfest 2026–27</h3>
+              <p>Presented RoboReach as an entry for IIT Techfest 2026–27, taking the robot from workbench assembly to live wireless demonstration.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="developer">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">06 // Creator</span>
+          <h2>Meet the Developer</h2>
+        </div>
+
+        <div class="dev-card reveal">
+          <div class="dev-avatar" aria-hidden="true">
+            <div class="avatar-ring"><span>PKP</span></div>
+            <span class="dev-loc">Gandhinagar, Gujarat</span>
+          </div>
+
+          <div class="dev-info">
+            <h3>Prerak Kumar Patel</h3>
+            <p class="dev-role">B.Tech – Electronics and Communication Engineering (ECE)</p>
+            <p class="dev-edu">Karnavati University, Ahmedabad &middot; Batch of 2030</p>
+
+            <p class="dev-bio">
+              I’m an Electronics and Communication Engineering student passionate about building systems where software, embedded electronics, and mechanical hardware come together. RoboReach is my most comprehensive robotics build so far, combining omnidirectional mobility, servo manipulation, and wireless control.
+            </p>
+
+            <div class="skills-block">
+              <h4>Technical Skills</h4>
+              <ul class="skills-list">
+                <li>Robotics and Robot Assembly</li>
+                <li>Electronics and Circuit Integration</li>
+                <li>Sensor and Motor Integration</li>
+                <li>Arduino Programming</li>
+                <li>C Programming</li>
+                <li>Python</li>
+                <li>SOLIDWORKS</li>
+                <li>Motor and Servo Control</li>
+              </ul>
+            </div>
+
+            <div class="dev-actions">
+              <a class="btn btn-primary" href="https://www.linkedin.com/in/prerak-kumar-patel-a56004448/" target="_blank" rel="noopener noreferrer">
+                <span>Connect with Me</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              <a class="btn btn-secondary" href="#demo">Try Drive Simulation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gallery">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">07 // Visual Documentation</span>
+          <h2>Project Gallery</h2>
+          <p class="section-lead">
+            Dedicated photo slots prepared for RoboReach build documentation. Replace these blueprint placeholders with actual project photographs when ready.
+          </p>
+        </div>
+
+        <div class="gallery-grid">
+          <figure class="gallery-card gallery-featured reveal">
+            <div class="gallery-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 400 260" fill="none">
+                <rect width="400" height="260" fill="var(--surface-deep)"/>
+                <path d="M0 65h400M0 130h400M0 195h400M100 0v260M200 0v260M300 0v260" stroke="var(--grid-line)" stroke-width="1"/>
+                <rect x="145" y="75" width="110" height="120" rx="12" stroke="var(--electric)" stroke-width="2.5" stroke-dasharray="6 4"/>
+                <circle cx="200" cy="135" r="24" stroke="var(--accent)" stroke-width="2"/>
+                <path d="M200 75V42l20-16" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <text x="200" y="232" text-anchor="middle" fill="var(--mute)" font-family="JetBrains Mono, monospace" font-size="12">PHOTO SLOT 01 // FULL ROBOT</text>
+              </svg>
+            </div>
+            <figcaption>
+              <span class="gallery-tag">Showcase</span>
+              <h3>Actual RoboReach Robot Photographs</h3>
+              <p>Full chassis, mecanum wheel stance, and overall build appearance.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="gallery-card reveal">
+            <div class="gallery-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 320 200" fill="none">
+                <rect width="320" height="200" fill="var(--surface-deep)"/>
+                <rect x="95" y="55" width="130" height="80" rx="8" stroke="var(--electric)" stroke-width="2" stroke-dasharray="5 4"/>
+                <rect x="75" y="65" width="16" height="30" rx="3" stroke="var(--accent)" stroke-width="2"/>
+                <rect x="229" y="65" width="16" height="30" rx="3" stroke="var(--accent)" stroke-width="2"/>
+                <text x="160" y="176" text-anchor="middle" fill="var(--mute)" font-family="JetBrains Mono, monospace" font-size="11">PHOTO SLOT 02 // ASSEMBLY</text>
+              </svg>
+            </div>
+            <figcaption>
+              <span class="gallery-tag">Mechanical</span>
+              <h3>Robot Assembly Photographs</h3>
+              <p>Frame construction, motor mounts, and mecanum wheel alignment.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="gallery-card reveal">
+            <div class="gallery-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 320 200" fill="none">
+                <rect width="320" height="200" fill="var(--surface-deep)"/>
+                <rect x="110" y="52" width="100" height="72" rx="6" stroke="var(--electric)" stroke-width="2"/>
+                <path d="M110 74H70M110 102H70M210 74h40M210 102h40" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="160" cy="88" r="10" stroke="var(--accent)" stroke-width="2"/>
+                <text x="160" y="176" text-anchor="middle" fill="var(--mute)" font-family="JetBrains Mono, monospace" font-size="11">PHOTO SLOT 03 // CIRCUITRY</text>
+              </svg>
+            </div>
+            <figcaption>
+              <span class="gallery-tag">Electronics</span>
+              <h3>Circuit and Wiring Photographs</h3>
+              <p>Controller connections, power distribution, and wireless integration.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="gallery-card reveal">
+            <div class="gallery-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 320 200" fill="none">
+                <rect width="320" height="200" fill="var(--surface-deep)"/>
+                <path d="M100 135l48-48 44-12" stroke="var(--electric)" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="148" cy="87" r="7" fill="var(--accent)"/>
+                <path d="M192 75l22-14M192 75l22 14" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <text x="160" y="176" text-anchor="middle" fill="var(--mute)" font-family="JetBrains Mono, monospace" font-size="11">PHOTO SLOT 04 // ARM &amp; GRIPPER</text>
+              </svg>
+            </div>
+            <figcaption>
+              <span class="gallery-tag">Manipulator</span>
+              <h3>Robotic Arm and Gripper Photographs</h3>
+              <p>Servo joints, linkage mechanism, and gripper jaws up close.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="gallery-card reveal">
+            <div class="gallery-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 320 200" fill="none">
+                <rect width="320" height="200" fill="var(--surface-deep)"/>
+                <circle cx="160" cy="86" r="36" stroke="var(--electric)" stroke-width="2" stroke-dasharray="6 4"/>
+                <polygon points="150,72 150,100 176,86" fill="var(--accent)"/>
+                <text x="160" y="176" text-anchor="middle" fill="var(--mute)" font-family="JetBrains Mono, monospace" font-size="11">PHOTO SLOT 05 // TECHFEST DEMO</text>
+              </svg>
+            </div>
+            <figcaption>
+              <span class="gallery-tag">Exhibition</span>
+              <h3>Project Demonstration Photographs</h3>
+              <p>Live testing and demonstration at IIT Techfest 2026–27.</p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <strong>RoboReach Project</strong>
+        <p>Wireless Mecanum-Wheeled Mobile Manipulator &middot; IIT Techfest 2026–27</p>
+      </div>
+
+      <div class="footer-links">
+        <span>Developed by <strong>Prerak Kumar Patel</strong></span>
+        <span aria-hidden="true">&middot;</span>
+        <a href="https://www.linkedin.com/in/prerak-kumar-patel-a56004448/" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a>
+      </div>
+
+      <div class="footer-copy">
+        <span>&copy; <span id="copy-year">2026</span> Prerak Kumar Patel. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const root = document.documentElement;
+      const themeBtn = document.getElementById('theme-toggle');
+
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        if (themeBtn) themeBtn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+        try { localStorage.setItem('roboreach-theme', theme); } catch (_) {}
+      }
+
+      (function initTheme() {
+        let saved = null;
+        try { saved = localStorage.getItem('roboreach-theme'); } catch (_) {}
+        if (saved === 'light' || saved === 'dark') {
+          applyTheme(saved);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          applyTheme('light');
+        } else {
+          applyTheme('dark');
+        }
+      })();
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+          applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+      }
+
+      const menuToggle = document.getElementById('menu-toggle');
+      const primaryNav = document.getElementById('primary-nav');
+
+      function setMenuOpen(isOpen) {
+        if (!menuToggle || !primaryNav) return;
+        menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        primaryNav.classList.toggle('open', isOpen);
+      }
+
+      if (menuToggle && primaryNav) {
+        menuToggle.addEventListener('click', () => {
+          const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+          setMenuOpen(!expanded);
+        });
+        primaryNav.querySelectorAll('a').forEach((link) => {
+          link.addEventListener('click', () => setMenuOpen(false));
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') setMenuOpen(false);
+        });
+      }
+
+      const revealEls = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                obs.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12 }
+        );
+        revealEls.forEach((el) => observer.observe(el));
+      } else {
+        revealEls.forEach((el) => el.classList.add('is-visible'));
+      }
+
+      const copyYear = document.getElementById('copy-year');
+      if (copyYear) copyYear.textContent = String(Math.max(2026, new Date().getFullYear()));
+
+      const ROLLER_L = 'M-4 -6 L26 8 M-4 6 L26 20 M-4 18 L26 32 M-4 30 L26 44 M-4 42 L26 56 M-4 -18 L26 -4';
+      const ROLLER_R = 'M-4 8 L26 -6 M-4 20 L26 6 M-4 32 L26 18 M-4 44 L26 30 M-4 56 L26 42 M-4 -4 L26 -18';
+      let clipCounter = 0;
+
+      function buildWheelMarkup(x, y, width, height, pattern, running) {
+        clipCounter += 1;
+        const cid = 'wheel-clip-' + clipCounter;
+        const style = running ? 'animation-play-state:running;animation-duration:1.3s' : '';
+        return (
+          `<g transform="translate(${x},${y})">` +
+            `<clipPath id="${cid}"><rect width="${width}" height="${height}" rx="5"/></clipPath>` +
+            `<rect width="${width}" height="${height}" rx="5" fill="var(--wheel-bg)" stroke="var(--electric)" stroke-width="1.5"/>` +
+            `<g clip-path="url(#${cid})">` +
+              `<g class="roll" style="${style}">` +
+                `<path d="${pattern}" stroke="var(--accent)" stroke-width="3"/>` +
+              `</g>` +
+            `</g>` +
+          `</g>`
+        );
+      }
+
+      const heroWheelLayer = document.querySelector('.hero-wheels-layer');
+      if (heroWheelLayer) {
+        const heroCoords = [
+          [56, 118, 24, 52, ROLLER_L],
+          [240, 118, 24, 52, ROLLER_R],
+          [56, 198, 24, 52, ROLLER_R],
+          [240, 198, 24, 52, ROLLER_L]
+        ];
+        heroWheelLayer.innerHTML = heroCoords
+          .map((c) => buildWheelMarkup(c[0], c[1], c[2], c[3], c[4], true))
+          .join('');
+      }
+
+      const stage = document.getElementById('stage');
+      const rb = document.getElementById('rb');
+      const demoSvg = document.getElementById('demoSvg');
+      const motionReadout = document.getElementById('motion-readout');
+      const wheelBoxes = document.querySelectorAll('#wheels-telemetry .wheel-box');
+      const ctrlButtons = document.querySelectorAll('.ctrl-btn[data-cmd]');
+      const resetBtn = document.getElementById('reset-sim');
+      const stopBtn = document.getElementById('stop-sim');
+      const armBtn = document.getElementById('toggle-arm');
+      const gripBtn = document.getElementById('toggle-grip');
+      const simArmSlide = document.getElementById('sim-arm-slide');
+      const simGripper = document.getElementById('sim-gripper');
+
+      if (!stage || !rb || !demoSvg) return;
+
+      const simCoords = [
+        [20, 82, 22, 46, ROLLER_L],
+        [158, 82, 22, 46, ROLLER_R],
+        [20, 138, 22, 46, ROLLER_R],
+        [158, 138, 22, 46, ROLLER_L]
+      ];
+      const simWheelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      simWheelGroup.innerHTML = simCoords
+        .map((c) => buildWheelMarkup(c[0], c[1], c[2], c[3], c[4], false))
+        .join('');
+      demoSvg.insertBefore(simWheelGroup, demoSvg.firstChild);
+
+      const simRollers = demoSvg.querySelectorAll('.roll');
+
+      const CMD_VECTORS = {
+        fwd:    { f:  1, s:  0, t:  0 },
+        bwd:    { f: -1, s:  0, t:  0 },
+        right:  { f:  0, s:  1, t:  0 },
+        left:   { f:  0, s: -1, t:  0 },
+        diagFR: { f:  1, s:  1, t:  0 },
+        diagFL: { f:  1, s: -1, t:  0 },
+        diagBR: { f: -1, s:  1, t:  0 },
+        diagBL: { f: -1, s: -1, t:  0 },
+        rotR:   { f:  0, s:  0, t:  1 },
+        rotL:   { f:  0, s:  0, t: -1 }
+      };
+
+      const activeInputs = new Set();
+      let posX = 0;
+      let posY = 0;
+      let angleDeg = 0;
+      let rafId = 0;
+      let initialized = false;
+
+      function centerRobot() {
+        const rect = stage.getBoundingClientRect();
+        posX = rect.width / 2 - 46;
+        posY = rect.height / 2 - 55;
+        angleDeg = 0;
+        renderTransform();
+      }
+
+      function renderTransform() {
+        rb.style.transform = `translate(${posX}px, ${posY}px) rotate(${angleDeg}deg)`;
+      }
+
+      function getCombinedVector() {
+        let f = 0, s = 0, t = 0;
+        activeInputs.forEach((cmd) => {
+          const vec = CMD_VECTORS[cmd];
+          if (!vec) return;
+          f += vec.f; s += vec.s; t += vec.t;
+        });
+        return {
+          f: Math.max(-1, Math.min(1, f)),
+          s: Math.max(-1, Math.min(1, s)),
+          t: Math.max(-1, Math.min(1, t))
+        };
+      }
+
+      function describeMotion(f, s, t) {
+        const parts = [];
+        if (f > 0 && s > 0) parts.push('Diagonal Forward-Right');
+        else if (f > 0 && s < 0) parts.push('Diagonal Forward-Left');
+        else if (f < 0 && s > 0) parts.push('Diagonal Reverse-Right');
+        else if (f < 0 && s < 0) parts.push('Diagonal Reverse-Left');
+        else if (f > 0) parts.push('Moving Forward');
+        else if (f < 0) parts.push('Moving Reverse');
+        else if (s > 0) parts.push('Strafing Right');
+        else if (s < 0) parts.push('Strafing Left');
+
+        if (t > 0) parts.push('Rotating Clockwise');
+        else if (t < 0) parts.push('Rotating Counter-Clockwise');
+
+        return parts.length ? parts.join(' + ') : 'Stationary';
+      }
+
+      function updateSimulationState() {
+        const { f, s, t } = getCombinedVector();
+        const wheels = [f + s + t, f - s - t, f - s + t, f + s - t];
+
+        simRollers.forEach((el, idx) => {
+          const val = wheels[idx];
+          el.classList.toggle('rv', val > 0);
+          el.style.animationPlayState = val !== 0 ? 'running' : 'paused';
+        });
+
+        wheelBoxes.forEach((box, idx) => {
+          const val = wheels[idx];
+          const dirEl = box.querySelector('.w-dir');
+          const txtEl = box.querySelector('.w-txt');
+          box.classList.remove('is-fwd', 'is-rev');
+
+          if (val > 0) {
+            box.classList.add('is-fwd');
+            if (dirEl) dirEl.textContent = '▲';
+            if (txtEl) txtEl.textContent = 'Fwd';
+          } else if (val < 0) {
+            box.classList.add('is-rev');
+            if (dirEl) dirEl.textContent = '▼';
+            if (txtEl) txtEl.textContent = 'Rev';
+          } else {
+            if (dirEl) dirEl.textContent = '–';
+            if (txtEl) txtEl.textContent = 'Idle';
+          }
+        });
+
+        ctrlButtons.forEach((btn) => {
+          btn.classList.toggle('on', activeInputs.has(btn.dataset.cmd));
+        });
+
+        if (motionReadout) motionReadout.textContent = 'State: ' + describeMotion(f, s, t);
+
+        const moving = f !== 0 || s !== 0 || t !== 0;
+        if (moving && !rafId) rafId = requestAnimationFrame(stepPhysics);
+      }
+
+      function stepPhysics() {
+        const { f, s, t } = getCombinedVector();
+        if (f === 0 && s === 0 && t === 0) { rafId = 0; return; }
+
+        const rect = stage.getBoundingClientRect();
+        const rad = (angleDeg * Math.PI) / 180;
+        const len = Math.hypot(f, s) || 1;
+        const nf = f / len;
+        const ns = s / len;
+        const speed = 2.8;
+
+        posX += (Math.sin(rad) * nf + Math.cos(rad) * ns) * speed;
+        posY += (-Math.cos(rad) * nf + Math.sin(rad) * ns) * speed;
+        angleDeg += t * 2.3;
+
+        posX = Math.max(-8, Math.min(rect.width - 84, posX));
+        posY = Math.max(-8, Math.min(rect.height - 102, posY));
+
+        renderTransform();
+        rafId = requestAnimationFrame(stepPhysics);
+      }
+
+      function stopAll() {
+        activeInputs.clear();
+        updateSimulationState();
+      }
+
+      ctrlButtons.forEach((btn) => {
+        const cmd = btn.dataset.cmd;
+        btn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          activeInputs.add(cmd);
+          updateSimulationState();
+        });
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach((evt) => {
+          btn.addEventListener(evt, () => {
+            activeInputs.delete(cmd);
+            updateSimulationState();
+          });
+        });
+      });
+
+      if (stopBtn) stopBtn.addEventListener('click', stopAll);
+      if (resetBtn) resetBtn.addEventListener('click', () => { stopAll(); centerRobot(); });
+
+      if (armBtn && simArmSlide) {
+        armBtn.addEventListener('click', () => {
+          const next = armBtn.getAttribute('aria-pressed') !== 'true';
+          armBtn.setAttribute('aria-pressed', String(next));
+          armBtn.textContent = next ? 'Retract Arm' : 'Extend Arm';
+          simArmSlide.classList.toggle('extended', next);
+        });
+      }
+
+      if (gripBtn && simGripper) {
+        gripBtn.addEventListener('click', () => {
+          const next = gripBtn.getAttribute('aria-pressed') !== 'true';
+          gripBtn.setAttribute('aria-pressed', String(next));
+          gripBtn.textContent = next ? 'Open Gripper' : 'Close Gripper';
+          simGripper.classList.toggle('closed', next);
+        });
+      }
+
+      const KEY_MAP = {
+        ArrowUp: 'fwd', ArrowDown: 'bwd', ArrowLeft: 'left', ArrowRight: 'right',
+        w: 'fwd', W: 'fwd', s: 'bwd', S: 'bwd', a: 'left', A: 'left',
+        d: 'right', D: 'right', q: 'rotL', Q: 'rotL', e: 'rotR', E: 'rotR'
+      };
+
+      window.addEventListener('keydown', (e) => {
+        const cmd = KEY_MAP[e.key];
+        if (!cmd) return;
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement && document.activeElement.tagName)) return;
+        e.preventDefault();
+        if (!activeInputs.has(cmd)) {
+          activeInputs.add(cmd);
+          updateSimulationState();
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        const cmd = KEY_MAP[e.key];
+        if (!cmd) return;
+        activeInputs.delete(cmd);
+        updateSimulationState();
+      });
+
+      window.addEventListener('blur', stopAll);
+
+      window.addEventListener('resize', () => {
+        if (!initialized) {
+          centerRobot();
+          initialized = true;
+        } else {
+          const rect = stage.getBoundingClientRect();
+          posX = Math.max(-8, Math.min(rect.width - 84, posX));
+          posY = Math.max(-8, Math.min(rect.height - 102, posY));
+          renderTransform();
+        }
+      });
+
+      centerRobot();
+      initialized = true;
+    })();
+  </script>
+</body>
+</html>
